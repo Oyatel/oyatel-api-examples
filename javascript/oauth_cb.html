@@ -1,0 +1,51 @@
+<html>
+<head>
+	
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.4/jquery.min.js"></script>
+<script type="text/javascript">
+
+function getUrlVars() {
+	var vars = {};
+	var parts = window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi, function(m,key,value) {
+		vars[key] = value;
+	});
+	return vars;
+}
+
+function checkReponse() {
+	var urlVars = getUrlVars();
+	if (urlVars['error']) {
+		alert('Whoops, seems we got an error: ' + urlVars['error']);
+		window.opener.authUnsuccessful(urlVars['error']);
+		return;
+	}
+	
+	// do something else...
+	var fragment = unescape(self.document.location.hash.substring(1));
+	
+	// now get token, expire etc. from fragment
+	var parts = fragment.split(/^access_token=(.*?)&expires_in=(.*?)&scope=(.*)$/);
+	var access_token = parts[1];
+	var expires_in = parts[2];
+	var scope = parts[3];
+	
+	// now set cookie
+	
+	window.opener.Oyatel.wasAuthorized(access_token);
+	window.close();
+	// document.write("Got ACCESS_TOKEN: " + access_token);
+}
+
+checkReponse();
+
+// var access_token = $.cookie('oyatel_access');
+// console.log('Cookie is: ' + $.cookie('oyatel_access'));
+	
+</script>
+</head>
+<body>
+
+
+
+</body>
+</html>
