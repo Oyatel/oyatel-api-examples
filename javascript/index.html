@@ -1,13 +1,8 @@
 <html>
 <head>
 
-<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.4/jquery.min.js"></script>
-<script type="text/javascript" src="https://api.oyatel.com/cometd/jquery/jquery.json-2.2.js"></script>
-<script type="text/javascript" src="js/jquery.cookie.js"></script>
-<script type="text/javascript" src="https://api.oyatel.com/cometd/org/cometd.js"></script>
-<script type="text/javascript" src="https://api.oyatel.com/cometd/jquery/jquery.cometd.js"></script>
-<script type="text/javascript" src="https://api.oyatel.com/cometd/oyatelapi.js"></script>
-<script type="text/javascript" src="jslib/OyatelApi.js"></script>
+<script type="text/javascript" src="https://ajax.microsoft.com/ajax/jquery/jquery-1.5.min.js"></script>
+<script type="text/javascript" src="https://api.oyatel.com/cometd/oyatel.pack.min.js"></script>
 
 <style>
 	#connect .authorized {
@@ -46,13 +41,17 @@
 <script type="text/javascript">
 
 $(document).ready(function() {
-	Oyatel.init('558f6868-0a98-45db-ab57-35173f4ec960', 'http://127.0.01/~even/js-api-example/oauth_cb.html');
+	Oyatel.init('558f6868-0a98-45db-ab57-35173f4ec960', 'http://127.0.01/~even/oyatel-api-examples/javascript/oauth_cb.html');
 	
 	// Setup callbacks for deauth/auth-orization
 	Oyatel.onAuthorized = function() {
 		console.log('onAuthorized callback called');
 		authorized();
 	};
+	Oyatel.onAuthorizationFailed = function(errormsg) {
+		console.log('The user rejected the authorization, or some error occured: ' + errormsg);
+	};
+	
 	Oyatel.onDeauthorized = function() {
 		console.log('onDeauthorized callback called');
 		deauthorized();
@@ -66,6 +65,8 @@ $(document).ready(function() {
 	
 	// setup GUI to show we are authorized and start listening to events
 	function authorized() {
+		console.log('calling authorized');
+		
 		$('#connect .authorized').css('display', 'block');
 		$('#connect .not-authorized').css('display', 'none');
 		
@@ -74,23 +75,24 @@ $(document).ready(function() {
 			$('.oyatel-username').html(user.username + ' (' + user.firstname + ' ' + user.lastname + ')');
 		});
 		
-		// ? Oyatel.Events.clearListeners();
 		Oyatel.Events.subscribe('/events/call', function(msg) {
 			// add call info to the output...
-			var dataString = [
-				'<div class="callevent">',
-				msg.data.direction == "out" ? "Outgoing Call from (destination TODO)" : "Incoming Call from ",
-				msg.data.callerId.number,
-				'</div>'
-			];
-			$('#call_events').append(dataString.join(''));
+			
+			var string = "";
+			if (msg.data.direction == "out") {
+				string = "User " + msg.data.userId + " calls " + msg.data.destination + " from " + msg.data.callerId.number + ". Current call state is: " + msg.data.event;
+			} else {
+				string = "User " + msg.data.userId + " receives call from from " + msg.data.callerId.number + ". Current call state is: " + msg.data.event;
+			}
+			var dataString = '<div class="callevent">' + string + '</div>';
+			$('#call_events').append(dataString);
 		});	
-		
+	
 		Oyatel.Events.subscribe('/events/presence', function(msg) {
 			console.log('Got presence package: ', msg);
 		});
 	}
-	
+			
 	// setup GUI to show we are not authorized
 	function deauthorized() {
 		$('#connect .authorized').css('display', 'none');
