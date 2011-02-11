@@ -1,9 +1,10 @@
 ﻿/*
  * Demo for using REST- and Streaming events API with Oyatel Connect.
  * 
- * Remember to include reference to cometd2.dll for CometD-support,
+ * Remember to include reference to cometd2.dll for CometD-support
+ * (see CometD.NET-project at https://github.com/Oyatel/CometD.NET),
  * and to System.ServiceModel, System.ServiceModel.Web and System.Web.Extensions for Json-support.
- * This example uses .NET 4.0 (does *not* work with Client Profile)
+ * This example uses .NET 3.5 (does *not* work with Client Profile)
  * */
 using System;
 using System.Collections.Generic;
