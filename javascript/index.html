@@ -1,15 +1,14 @@
 <html>
 <head>
 
-<script type="text/javascript" src="http://code.jquery.com/jquery-1.5.1.js"></script>
+<script type="text/javascript" src="http://code.jquery.com/jquery-1.5.1.js"></script>  
 <script type="text/javascript" src="js/cometd.js"></script>
 <script type="text/javascript" src="js/jquery.cometd.js"></script>
-<script type="text/javascript" src="js/jquery.cookie.js""></script>
-<script type="text/javascript" src="js/jquery.json-2.2.js""></script>
-<script type="text/javascript" src="js/jquery.jsonp-2.1.4.js""></script>
-<script type="text/javascript" src="js/Oyatel.js""></script>
-<script type="text/javascript" src="js/oyatelapi.js""></script>
-
+<script type="text/javascript" src="js/jquery.cookie.js"></script>
+<script type="text/javascript" src="js/jquery.json-2.2.js"></script>
+<script type="text/javascript" src="js/jquery.jsonp-2.1.4.min.js"></script>
+<script type="text/javascript" src="js/oyatelapi.js"></script>
+<script type="text/javascript" src="js/Oyatel.js"></script>
 
 <style>
 	#connect .authorized {
@@ -36,6 +35,9 @@
 	</div>
 	<div class="authorized">
 		Logged in as: <span class="oyatel-username"></span> <button class="oyatel-logout">Logout</button>
+	</div>
+	<div class="testJacek" style="display:none;">
+		Presence package : <span class="testUserData"></span>
 	</div>
 </div>
 
@@ -73,6 +75,9 @@ $(document).ready(function() {
 		$('#connect .authorized').css('display', 'block');
 		$('#connect .not-authorized').css('display', 'none');
 		
+		
+
+		
 		// get ME info...
 		Oyatel.User.currentUser(function(user) {
 			$('.oyatel-username').html(user.username + ' (' + user.firstname + ' ' + user.lastname + ')');
@@ -93,8 +98,10 @@ $(document).ready(function() {
 		});	
 	
 		Oyatel.Events.subscribe('/events/presence', function(msg) {
-			// console.log('Got presence package: ', msg);
+			console.log('Got presence package: ', msg.data);
+			$('#connect .jacekTest').css('display', 'block');
 		});
+		
 	}
 			
 	// setup GUI to show we are not authorized
