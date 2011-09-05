@@ -186,9 +186,26 @@ Oyatel = function() {
 				
 				getQueues: function(cb) {
 					_performRestRequest('https://rest.oyatel.com/queue/getQueues.json', null, cb);
+				},
+				setQueueMemberships: function(queueIds, cb) {
+					_performRestRequest('https://rest.oyatel.com/queue/setQueueMemberships.json', {
+						queueIds: queueIds
+					}, cb);
 				}
 			}
 		}(),
+		Customer: function() {
+			return {
+				Queue: function() {
+					return {
+						getQueues: function(cb) {
+							// thought interface for customer-based operations
+							console.log('Calling customer-function');
+						}
+					}();
+				}	
+			}()
+		},
 		Call: function() {
 			return {
 				callback: function(params, cb) {
