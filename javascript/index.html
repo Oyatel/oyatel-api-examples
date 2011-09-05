@@ -1,12 +1,34 @@
 <html>
 <head>
 
-<script type="text/javascript" src="http://code.jquery.com/jquery-1.5.1.js"></script>
-<script type="text/javascript" src="https://api.oyatel.com/cometd/oyatel.pack.min.js"></script>
+<script type="text/javascript" src="http://code.jquery.com/jquery-1.5.1.js"></script>  
+<script type="text/javascript" src="js/cometd.js"></script>
+<script type="text/javascript" src="js/jquery.cometd.js"></script>
+<script type="text/javascript" src="js/jquery.cookie.js"></script>
+<script type="text/javascript" src="js/jquery.json-2.2.js"></script>
+<script type="text/javascript" src="js/jquery.jsonp-2.1.4.min.js"></script>
+<script type="text/javascript" src="js/oyatelapi.js"></script>
+<script type="text/javascript" src="js/Oyatel.js"></script>
 
 <style>
 	#connect .authorized {
 		display: none;
+	}
+	
+	.presenceEventsTest {
+		height: auto;
+		width: 350px;
+		float: left;
+		position: relative;
+		
+	}
+	
+	.fulldumpObject {
+		width: 300px;
+		height: auto;
+		float: left;
+		position: relative;
+		background-color: #F0F0F0;
 	}
 	
 	.btn-oyatel-login {
@@ -14,6 +36,13 @@
 		width: 156px;
 		height: 24px;
 		background: url('img/connect_with_oyatel-156-24.png') no-repeat;
+	}
+	
+	#call_events {
+		position: relative;
+		width: 530px;
+		height: auto;
+		float: left;
 	}
 	
 	.btn-oyatel-login span {
@@ -31,7 +60,12 @@
 		Logged in as: <span class="oyatel-username"></span> <button class="oyatel-logout">Logout</button>
 	</div>
 </div>
-
+<div class="fulldumpObject">
+	<h1>Users status</h1>
+</div>
+<div class="presenceEventsTest">
+	<h1>Presence Events</h1>
+</div>
 <div id="call_events">
 	<h1>Call Events</h1>
 </div>
@@ -39,9 +73,11 @@
 
 
 <script type="text/javascript">
+var _Ids = new Array();
+var _usernames = new Array();
 
 $(document).ready(function() {
-	Oyatel.init('558f6868-0a98-45db-ab57-35173f4ec960', 'http://127.0.0.1/~even/oyatel-api-examples/javascript/oauth_cb.html');
+	Oyatel.init('211744cd-890f-448f-9d08-f51966115308', 'http://localhost/~jaceklawniczak/gitProject/oyatel-api-examples/javascript/oauth_cb.html');
 	
 	// Setup callbacks for deauth/auth-orization
 	Oyatel.bind('authorized', function() {
@@ -66,28 +102,81 @@ $(document).ready(function() {
 		$('#connect .authorized').css('display', 'block');
 		$('#connect .not-authorized').css('display', 'none');
 		
+		Oyatel.Events.subscribe('/events/presence', function(msg) {
+			console.log('Got presence package: ', msg.data);	
+			
+			var eventString = "";
+			var fulldumpString = "";
+			var allEvents = "";
+				if (msg.data.event == "fulldump") {
+					fulldumpString = "";
+					for (var i in msg.data.events) {
+						$('.fulldumpObject').append('<div class="users_list" id="' 
+								+ msg.data.events[i].userId   
+								+ '">' 
+						+ msg.data.events[i].username 
+						//+ " ID:"
+						//+ msg.data.events[i].userId  
+						+ '</div');
+					_Ids[i] = msg.data.events[i].userId;
+					_usernames[i] = msg.data.events[i].username;
+					
+						if (msg.data.events[i].state == "AVAILABLE") $('#' + msg.data.events[i].userId).css('background-color', 'green');
+							else if (msg.data.events[i].state == "BUSY") $('#' + msg.data.events[i].userId).css('background-color', 'red');
+							else if (msg.data.events[i].state == "RINGING") $('#' + msg.data.events[i].userId).css('background-color', 'orange');
+						else $('#' + msg.data.events[i].userId).css('display', 'none');
+					}
+				}
+				else {
+					eventString = '' 
+					+ msg.data.firstname 
+					+ ' ' 
+					+ msg.data.lastname 
+					+ ' changed status to ' 
+					+ msg.data.state;
+					
+					if (msg.data.state == "AVAILABLE") $('#'+msg.data.userId).css('background-color', 'green');
+						else if (msg.data.state == "BUSY") $('#'+msg.data.userId).css('background-color', 'red');
+						else if (msg.data.state == "RINGING") $('#'+msg.data.userId).css('background-color', 'orange');
+					else $('#' + msg.data.events[i].userId).css('display', 'none');
+				}
+								
+			$('.presenceEventsTest').append('<div class="presence_event">' + eventString + '</div');
+		});
+
+		
 		// get ME info...
 		Oyatel.User.currentUser(function(user) {
 			$('.oyatel-username').html(user.username + ' (' + user.firstname + ' ' + user.lastname + ')');
 		});
+		
 		
 		Oyatel.Events.subscribe('/events/call', function(msg) {
 			// add call info to the output...
 			
 			var string = "";
 			if (msg.data.direction == "out") {
-				string = "User " + msg.data.userId + " calls " + msg.data.destination + " from " + msg.data.callerId.number + ". Current call state is: " + msg.data.event;
+				string = "User "; 
+				for (var i in _Ids) if (msg.data.userId == _Ids[i]) string += _usernames[i];
+				string += " calls "; 
+				string += msg.data.destination; 
+				string += " from "; 
+				string += msg.data.callerId.number; 
+				string += ". Current call state is: "; 
+				string += msg.data.event;
 			} else {
-				string = "User " + msg.data.userId + " receives call from from " + msg.data.callerId.number + ". Current call state is: " + msg.data.event;
+				string = "User ";
+				for (var i in _Ids) if (msg.data.userId == _Ids[i]) string += _usernames[i];
+				string += " receives call from from "; 
+				string += msg.data.callerId.number; 
+				string += ". Current call state is: "
+						+ msg.data.event;
 			}
 			var dataString = '<div class="callevent">' + string + '</div>';
 			$('#call_events').append(dataString);
 			console.log("Got call package: ", msg.data);
 		});	
-	
-		Oyatel.Events.subscribe('/events/presence', function(msg) {
-			// console.log('Got presence package: ', msg);
-		});
+		
 	}
 			
 	// setup GUI to show we are not authorized
