@@ -1,0 +1,219 @@
+	body { 
+		font: 62.5% "Trebuchet MS", sans-serif; 
+		margin: 50px;
+	}
+	
+	.leftWrapper {
+		width: 600px;
+		position: relative;
+		float: left;
+	}
+	
+	.rightWrapper {
+		width: 700px;
+		position: relative;	
+		float: left;
+		margin-left: 2px;
+	}
+	
+	.bottomWrapper {
+		width: 1302px;
+		position: relative;
+		float: left;
+	}
+	
+	.headerOyatelLogo {
+		background: url("https://static.oyatel.com/img/users/img/themeable/top_bg.png?v=3") no-repeat scroll right top #FFFFFF;
+		height: 60px;
+	}
+	
+	.mainContent {
+		display:none;
+	}
+	
+	.demoHeaders { 
+		margin-top: 2em; 
+	}
+	
+	.sectionTitle {
+		position: relative;
+		float: left;
+		width: 1302px;
+	}
+	
+	
+	ul#icons {
+		margin: 0; 
+		padding: 0;
+	}
+	
+	ul#icons li {
+		margin: 2px; 
+		position: relative; 
+		padding: 4px 0; 
+		cursor: pointer; 
+		float: left;  
+		list-style: none;
+	}
+	
+	ul#icons span.ui-icon {
+		float: left; 
+		margin: 0 4px;
+	}
+			
+	.height30 {
+		height: 30px;
+	}
+	#connect .authorized {
+		display: none;
+	}
+	
+	.btn-oyatel-login {
+		cursor: pointer;
+		width: 156px;
+		height: 24px;
+		background: url('../img/connect_with_oyatel-156-24.png') no-repeat;
+	}
+
+	.btn-oyatel-login span {
+		display: none;
+	}
+
+	.objHeader {
+		text-size: 13;
+		color: green;
+	}
+	
+	.objContent {
+		margin-left: 10px;
+	}
+	
+	.packageTitle {
+		color: red;
+		text-size: 14;
+	}
+	
+	.availableImg {
+		background: url('../img/dot-green-10.png') no-repeat;
+		height: 10px;
+		width: 10px;
+		float: left;
+		margin-right: 10px;
+		margin-top: 3px;		
+	}
+	
+	.userPresenceEvent {
+		float: right;
+		margin-right: 50%;
+	}
+	
+	.ringingImg {
+		background: url('../img/orange-dot-10.png') no-repeat;
+		height: 10px;
+		width: 10px;
+		float: left;
+		margin-right: 10px;
+		margin-top: 3px;
+	}
+	
+	.busyImg {
+		background: url('../img/red-dot.png') no-repeat;
+		height: 10px;
+		width: 10px;
+		float: left;
+		margin-right: 10px;
+		margin-top: 3px;
+	}
+	
+	.helpImg {
+		background: url('../img/help.png') no-repeat;
+		cursor: pointer;
+		height: 15px;
+		width: 15px;
+		position: absolute;
+		z-index: 200;
+		float: right;
+		top: 14px;
+		left: 195px;
+	}
+	
+	#callPackageHistoryTab {		
+		max-height: 400px;
+	}
+	
+	#callEventsHistoryTab {		 
+		max-height: 200px;
+	}
+	
+	#presenceEventsHistoryTab {		
+		max-height: 200px;
+	}
+	
+	#presencePackageHistoryTab {		
+		max-height: 400px;
+	}
+	
+	#queuePackageHistoryTab {
+		max-height: 400px;
+	}
+	
+	.accordionNavigation {
+		float: right;
+		display: none;
+	}
+	
+	.docsURL {
+		text-decoration: none;
+		float: right;
+		margin-top: 40px;
+	} 
+	
+	.docsURL a{
+		text-decoration: none;
+		color: orange;
+		font: 120% "Trebuchet MS", sans-serif;
+		
+	} 
+	
+	.historyGroup {
+		display: none;
+	}
+	
+	.newEvent {
+	    background: url("../img/newEventRed.png") no-repeat scroll 0 0 transparent;
+	    height: 20px;
+	    position: relative;
+	    width: 20px;
+	    z-index: 200;
+	    float: left;   
+	    margin-top: -5px; 	
+    	
+	}
+	
+	.newEvent p {
+		color: white;
+		font: "Trebuchet MS", sans-serif;
+		font-size: 11;
+		margin-top: 0px;
+		margin-left: 5px; 
+	}
+	
+	.ballsTest {
+		width: 1302px;
+		height: 40px;
+		position: relative;
+		z-index: 300;
+		float: left;
+	}
+	
+	#callCountDNB { display: none;}
+	#presenceCountDNB { display: none;	}
+	#queueCountDNB { display: none; }
+	#showCallEventsHistory { display: none; }
+	#showCallPackageHistory { display: none; }
+	#showPresencePackageHistory { display: none; }
+	#showPresenceEventsHistory { display: none; }
+	#showQueueEventsHistory { display: none; }
+	#showQueuePackageHistory { display: none; }
+	
+	
