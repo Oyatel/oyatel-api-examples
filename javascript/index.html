@@ -1,7 +1,11 @@
 <html>
 <head>
 
-<script type="text/javascript" src="http://code.jquery.com/jquery-1.5.1.js"></script>  
+<link type="text/css" href="css/styleOyatelAPI.custom.css" rel="stylesheet" />
+<link type="text/css" href="css/custom-theme/jquery-ui-1.8.16.custom.css" rel="stylesheet" />
+<script type="text/javascript" src="js/jquery-1.6.2.min.js"></script>
+<script type="text/javascript" src="js/jquery-ui-1.8.16.custom.min.js"></script>
+<script type="text/javascript" src="js/jquery-ui-1.8.16.custom.min.js"></script>
 <script type="text/javascript" src="js/cometd.js"></script>
 <script type="text/javascript" src="js/jquery.cometd.js"></script>
 <script type="text/javascript" src="js/jquery.cookie.js"></script>
@@ -9,72 +13,241 @@
 <script type="text/javascript" src="js/jquery.jsonp-2.1.4.min.js"></script>
 <script type="text/javascript" src="js/oyatelapi.js"></script>
 <script type="text/javascript" src="js/Oyatel.js"></script>
+<script type="text/javascript" src="js/jquery-blink.js"></script>
+<script type="text/javascript">
+$(function(){
 
-<style>
-	#connect .authorized {
-		display: none;
-	}
+	// Accordion
+	$("#accordion").accordion({ header: "h3" });
+
+	// Tabs
+	$('#tabs').tabs();
+	// Tabs2
+	$('#tabs2').tabs();
+
+
+	// Dialog			
+	$('#dialog1').dialog({
+		autoOpen: false,
+		width: 600,
+		buttons: {
+			"Ok": function() { 
+				$(this).dialog("close"); 
+			}, 
+			"Cancel": function() { 
+				$(this).dialog("close"); 
+			} 
+		}
+	});
 	
-	.presenceEventsTest {
-		height: auto;
-		width: 350px;
-		float: left;
-		position: relative;
-		
-	}
+	// Dialog Link
+	$('#dialog_link1').click(function(){
+		$('#dialog1').dialog('open');
+		return false;
+	});
 	
-	.fulldumpObject {
-		width: 300px;
-		height: auto;
-		float: left;
-		position: relative;
-		background-color: #F0F0F0;
-	}
+	// Dialog			
+	$('#dialog2').dialog({
+		autoOpen: false,
+		width: 600,
+		buttons: {
+			"Ok": function() { 
+				$(this).dialog("close"); 
+			}, 
+			"Cancel": function() { 
+				$(this).dialog("close"); 
+			} 
+		}
+	});
 	
-	.btn-oyatel-login {
-		cursor: pointer;
-		width: 156px;
-		height: 24px;
-		background: url('img/connect_with_oyatel-156-24.png') no-repeat;
-	}
+	// Dialog Link
+	$('#dialog_link2').click(function(){
+		$('#dialog2').dialog('open');
+		return false;
+	});
+
+	// Datepicker
+	$('#datepicker').datepicker({
+		inline: true
+	});
 	
-	#call_events {
-		position: relative;
-		width: 530px;
-		height: auto;
-		float: left;
-	}
+	// Slider
+	$('#slider').slider({
+		range: true,
+		values: [17, 67]
+	});
 	
-	.btn-oyatel-login span {
-		display: none;
-	}
-</style>
+	// Progressbar
+	$("#progressbar").progressbar({
+		value: 20 
+	});
+	
+	//hover states on the static widgets
+	$('ul#icons li').hover(
+		function() { $(this).addClass('ui-state-hover'); }, 
+		function() { $(this).removeClass('ui-state-hover'); }
+	);
+	
+});
+</script>
 </head>
 <body>
-
-<div id="connect">
-	<div class="not-authorized">
-		<div class="btn-oyatel-login"><span>Connect with Oyatel</span></div>
+<!-- Header -->
+	<div class="headerOyatelLogo">
+		<div id="connect">
+			<div class="not-authorized">
+				<div class="btn-oyatel-login"><span>Connect with Oyatel</span></div>
+			</div>
+			<div class="authorized">
+				<div>Logged in as: <span class="oyatel-username"></span> <button class="oyatel-logout">Logout</button></div>
+			</div>
+		</div>
+	<div class="docsURL"><a href="http://dev.oyatel.com/documentation/">Documentation</a></div>
 	</div>
-	<div class="authorized">
-		Logged in as: <span class="oyatel-username"></span> <button class="oyatel-logout">Logout</button>
-	</div>
-</div>
-<div class="fulldumpObject">
-	<h1>Users status</h1>
-</div>
-<div class="presenceEventsTest">
-	<h1>Presence Events</h1>
-</div>
-<div id="call_events">
-	<h1>Call Events</h1>
-</div>
+<div class="authorized">
+<div class="mainContent">
+		<div id="dialog2" title="Channels">
+			<p>Channels are streams of data being sent to your client based on the topic you are interested in subscribing to.
+On the client side you will subscribe to a channel, to receive events matching the channel to your listener/callback.
+You can subscribe to multiple channels with individual listeners for each..</p>
+		</div>
+		<div id="dialog1" title="Streaming API">
+			<p>The Oyatel Streaming API is a HTTP service using a long-polling technique often referred to as Comet. You can use this API to get real-time events for inbound/outbound calls, presence notifications and queue status updates. Since it is based on the HTTP protocol, it can easily be implemented in both web- and desktop-applications.
 
-
-
+.</p>
+		</div>
+<!-- Tabs -->
+<div class="ballsTest">	
+	
+	
+	
+</div>	
+		<div class="sectionTitle">
+			<h2>Streaming javaScript API:</h2>
+			<div id="dialog_link1" class="helpImg"></div>
+		</div>		
+		<div class="leftWrapper">
+			<div id="tabs" >
+				<div class="dynamicNavigationBar" >
+					<ul>
+						<li>
+							<a href="#callJQ" onclick="clearCount('#callCountDNB','call');">Call</a>
+							<div id="callCountDNB" class="newEvent"><p>0</p></div>
+						</li>
+						<li>
+							<a href="#presenceJQ" onclick="clearCount('#presenceCountDNB','presence');">Presence</a>
+							<div id="presenceCountDNB" class="newEvent"><p>0</p></div>
+						</li>
+						<li>
+							<a href="#queueJQ" onclick="clearCount('#queueCountDNB','queue');">Queue</a>
+							<div id="queueCountDNB" class="newEvent"><p>0</p></div>
+						</li>			
+					</ul>
+				</div>
+				<div id="callJQ">
+					<p class="ui-state-highlight ui-corner-all height30">Waiting for call events...</p>
+				</div>
+				<div id="presenceJQ">
+					<p class="ui-state-highlight ui-corner-all height30">Waiting for presence events...</p>
+				</div>				
+				<div id="queueJQ">
+					<p class="ui-state-highlight ui-corner-all height30">Waiting for queue events...</p>
+				</div>
+			</div>	
+		</div>	
+		<div class="rightWrapper">
+			<div id="tabs2" >
+				<ul>
+					<li><a href="#userCurrentUserJQ">User:currentUser</a></li>		
+					<li><a href="#fdQueueJQ">Fulldump:Queue</a></li>
+					<li><a href="#voicemailMailboxJQ">Voicemail:Mailbox</a></li>
+					<li><a href="#voicemailGetMessagesJQ">Voicemail:getMessages</a></li>					
+					<li><a href="#fdPresenceJQ">Fulldump:Presence</a></li>		
+				</ul>
+				<div id="userCurrentUserJQ"></div>				
+				<div id="fdQueueJQ"></div>
+				<div id="voicemailMailboxJQ"></div>
+				<div id="voicemailGetMessagesJQ"></div>		
+				<div id="fdPresenceJQ"></div>		
+			</div>
+		</div>
+<!-- Accordion -->
+		<div class="sectionTitle">
+				<h2>Channels:</h2>
+				<div id="dialog_link2" class="helpImg"></div>
+			</div>
+		<div class="bottomWrapper">
+			
+		
+		
+		<!-- <h2>Channels:<div id="dialog_link2" class="helpImg"></div></h2> -->
+		<div id="accordion">
+			<div>
+				<h3><a href="#">Contacts</a></h3>
+				<div class="userListJQ">
+					<div class="userPresenceEvent"></div>
+					<p id="loadingUserList" class="ui-state-highlight ui-corner-all height30">Loading user list...</p>
+				</div>
+			</div>
+			<div id="showPresenceEventsHistory">
+				<div>
+					<h3><a href="#">Presence events history</a></h3>
+					<div id="presenceEventsHistoryTab">
+					<div class="presenceEventsJQ"></div>
+					</div>
+				</div>
+			</div>	
+			<div id="showCallEventsHistory">
+				<div>
+					<h3><a href="#">Call events history</a></h3>
+					<div id="callEventsHistoryTab">
+						<div class="callEventsJQ"></div>
+					</div>
+				</div>
+			</div>
+			<div id="showCallPackageHistory">
+				<div>
+					<h3><a href="#">Call packages history</a></h3>
+					<div id="callPackageHistoryTab">
+						<div class="callPackagesJQ"></div>
+					</div>
+					
+				</div>
+			</div>
+			<div id="showPresencePackageHistory">
+				<div>
+					<h3><a href="#">Presence packages history</a></h3>
+					<div id="presencePackageHistoryTab">
+						<div class="presencePackagesJQ"></div>
+					</div>
+					
+				</div>
+			</div>
+			<div id="showQueuePackageHistory">
+				<div>
+					<h3><a href="#">Queue packages history</a></h3>
+					<div id="queuePackageHistoryTab">
+						<div class="queuePackagesJQ"></div>
+					</div>
+					
+				</div>
+			</div>	
+		</div>	
+		</div>			
 <script type="text/javascript">
 var _Ids = new Array();
 var _usernames = new Array();
+var callCount = 0;
+var presenceCount = 0;
+var queueCount = 0;
+
+function clearCount(id,count) {
+	$(id).css('display','none');	
+	
+	if (count == 'call') return callCount=0;
+	else if (count == 'presence') return presenceCount=0;
+	else return queueCount=0;
+};
 
 $(document).ready(function() {
 	Oyatel.init('558f6868-0a98-45db-ab57-35173f4ec960', 'http://127.0.0.1/~even/oyatel-api-examples/javascript/oauth_cb.html');
@@ -101,33 +274,113 @@ $(document).ready(function() {
 		
 		$('#connect .authorized').css('display', 'block');
 		$('#connect .not-authorized').css('display', 'none');
+		$('.mainContent').css('display', 'block');
+		
+		//print_r
+		
+		function dump(arr,level) {
+				var dumped_text = "";
+				if(!level) level = 0;
+				
+				//The padding given at the beginning of the line.
+				var level_padding = "";
+				for(var j=0;j<level+1;j++) level_padding += "    ";
+				
+				if(typeof(arr) == 'object') { //Array/Hashes/Objects 
+					for(var item in arr) {
+						var value = arr[item];
+						
+						if(typeof(value) == 'object') { //If it is an array,
+							dumped_text += level_padding + "<div class=\"objHeader\">'" + item + "' ...\n</div>";
+							dumped_text += dump(value,level+1);
+						} else {
+							dumped_text += level_padding + "<div class=\"objContent\">'" + item + "' => \"" + value + "\"\n</div>";
+						}
+					}
+				} else { //Stings/Chars/Numbers etc.
+					dumped_text = "===>"+arr+"<===("+typeof(arr)+")";
+				}
+				return dumped_text;
+		}
+		
+		Oyatel.User.currentUser(function(msg) {
+			console.log('Oyatel.User.currentUser :', msg);
+		});
+		
+		console.log('Oyatel.Voicemail.getMessageRecordingURL :', Oyatel.Voicemail.getMessageRecordingURL("1314606524_37887000","wav"));
+		
+		//events
+		
+		Oyatel.Events.subscribe('/events/queue', function(msg) {
+			console.log('Oyatel.Events.subscribe' + msg.channel + ' :', msg);
+		});
+		
+		//call events
+		
+			Oyatel.Events.subscribe('/events/call', function(msg) {
+				console.log('Oyatel.Events.subscribe' + msg.channel + ' msg :', msg);
+			});
+			
+			Oyatel.Events.subscribe('/events/call', function(msg) {
+				console.log('Oyatel.Events.subscribe' + msg.channel + ' msg.data :', msg.data);
+			});
+			
+			Oyatel.Events.subscribe('/events/call', function(msg) {
+				console.log('Oyatel.Events.subscribe' + msg.channel + ' msg.data.callerId :', msg.data.callerId);
+			});
+			
+		//presence events
+			
+			Oyatel.Events.subscribe('/events/presence', function(msg) {
+				console.log('Oyatel.Events.subscribe' + msg.channel + ' msg :', msg);
+			});
+			
 		
 		Oyatel.Events.subscribe('/events/presence', function(msg) {
 			console.log('Got presence package: ', msg.data);	
-			
 			var eventString = "";
 			var fulldumpString = "";
 			var allEvents = "";
 				if (msg.data.event == "fulldump") {
 					fulldumpString = "";
-					for (var i in msg.data.events) {
-						$('.fulldumpObject').append('<div class="users_list" id="' 
+					for (var i in msg.data.events) {						
+						$('.userListJQ').append('<div class="users_list" id="' 
 								+ msg.data.events[i].userId   
 								+ '">' 
-						+ msg.data.events[i].username 
-						//+ " ID:"
-						//+ msg.data.events[i].userId  
-						+ '</div');
+								+ msg.data.events[i].username  						 
+								+ '<div class="availableImg" id="available' + msg.data.events[i].userId 
+								+ '"></div>'
+								+ '<div class="ringingImg" id="ringing' + msg.data.events[i].userId 
+								+ '"></div>'
+								+ '<div class="busyImg" id="busy' + msg.data.events[i].userId 
+								+ '"></div>'						
+								+ '</div>');
+					
+					//arrays for ID>username convertion
 					_Ids[i] = msg.data.events[i].userId;
 					_usernames[i] = msg.data.events[i].username;
-					
-						if (msg.data.events[i].state == "AVAILABLE") $('#' + msg.data.events[i].userId).css('background-color', 'green');
-							else if (msg.data.events[i].state == "BUSY") $('#' + msg.data.events[i].userId).css('background-color', 'red');
-							else if (msg.data.events[i].state == "RINGING") $('#' + msg.data.events[i].userId).css('background-color', 'orange');
-						else $('#' + msg.data.events[i].userId).css('display', 'none');
+														
+						$('#loadingUserList').css('display', 'none');
+						if (msg.data.events[i].state == "AVAILABLE") {
+							$('#available' + msg.data.events[i].userId).css('display', 'block');
+							$('#busy' + msg.data.events[i].userId).css('display', 'none');
+							$('#ringing' + msg.data.events[i].userId).css('display', 'none');
+						}
+						else if (msg.data.events[i].state == "BUSY") {
+							$('#available' + msg.data.events[i].userId).css('display', 'none');
+							$('#busy' + msg.data.events[i].userId).css('display', 'block');
+							$('#ringing' + msg.data.events[i].userId).css('display', 'none');
+						}	
+						else if (msg.data.events[i].state == "RINGING") {
+							$('#available' + msg.data.events[i].userId).css('display', 'none');
+							$('#busy' + msg.data.events[i].userId).css('display', 'none');
+							$('#ringing' + msg.data.events[i].userId).css('display', 'block');
+						}
+						else $('#' + msg.data.events[i].userId).css('display', 'none');										
 					}
 				}
 				else {
+					
 					eventString = '' 
 					+ msg.data.firstname 
 					+ ' ' 
@@ -135,15 +388,29 @@ $(document).ready(function() {
 					+ ' changed status to ' 
 					+ msg.data.state;
 					
-					if (msg.data.state == "AVAILABLE") $('#'+msg.data.userId).css('background-color', 'green');
-						else if (msg.data.state == "BUSY") $('#'+msg.data.userId).css('background-color', 'red');
-						else if (msg.data.state == "RINGING") $('#'+msg.data.userId).css('background-color', 'orange');
-					else $('#' + msg.data.events[i].userId).css('display', 'none');
-				}
-								
-			$('.presenceEventsTest').append('<div class="presence_event">' + eventString + '</div');
+					//make a function out of it!
+					if (msg.data.state == "AVAILABLE") {
+						$('#available' + msg.data.userId).css('display', 'block');
+						$('#busy' + msg.data.userId).css('display', 'none');
+						$('#ringing' + msg.data.userId).css('display', 'none');
+					}
+					else if (msg.data.state == "BUSY") {
+						$('#available' + msg.data.userId).css('display', 'none');
+						$('#busy' + msg.data.userId).css('display', 'block');
+						$('#ringing' + msg.data.userId).css('display', 'none');
+					}
+					else if (msg.data.state == "RINGING") {
+						$('#available' + msg.data.userId).css('display', 'none');
+						$('#busy' + msg.data.userId).css('display', 'none'); 
+						$('#ringing' + msg.data.userId).css('display', 'block');
+					}
+					else $('#' + msg.data.userId).css('display', 'none');
+					
+					$('.presenceEventsJQ').append('<div class="presence_event">' + eventString + '</div');					
+					$('.userPresenceEvent').fadeIn('slow').html('<div class="ui-state-highlight ui-corner-all height30">' + eventString + '</div');
+					$('.userPresenceEvent').fadeOut('slow');
+				}								
 		});
-
 		
 		// get ME info...
 		Oyatel.User.currentUser(function(user) {
@@ -173,16 +440,114 @@ $(document).ready(function() {
 						+ msg.data.event;
 			}
 			var dataString = '<div class="callevent">' + string + '</div>';
-			$('#call_events').append(dataString);
-			console.log("Got call package: ", msg.data);
+			$('.callEventsJQ').append(dataString);
+			
+			console.log("Got call package: ", msg.data);	
+			
+			
 		});	
 		
-	}
+		//dumping packages for print
+		
+		Oyatel.Events.subscribe('/events/call', function(msg) {
 			
+			var string = dump(msg);	
+			callCount = callCount+1;
+				//if(callCount > 9) $('#callCountDNB').css('font-size',7).css('top','4px');
+				//else if(callCount > 99) $('#callCountDNB').css('font-size',5);	
+			var dataString = '<div class="wrapperTab"><div class=\"packageTitle\">Recieved CALL package:</div>' + string + '</div>';
+			var dataStringHistory = '<div class=\"packageTitle\">Recieved CALL package:</div>' + string;
+			var dataStringJQYellow = '<div id="callFade" class="ui-state-disabled">' + string + '</div>';
+			var dataStringJQ = '<div>' + string + '</div>';
+			$('#callJQ').html(dataStringJQYellow);
+					
+			$('#callCountDNB p').html(callCount);
+			$('#callFade').switchClass( "ui-state-disabled", 1500 );	
+			$('#showCallEventsHistory').css('display', 'block');
+			$('#showCallPackageHistory').css('display', 'block');
+			$('.callPackagesJQ').append(dataStringHistory);
+			$('#callCountDNB').effect("bounce", { times:3 }, 200).css('display','block');
+			
+			
+		});
+		
+		Oyatel.Events.subscribe('/events/presence', function(msg) {
+			
+			if (msg.data.event == "fulldump") {
+				$('#fdPresenceJQ').html(dump(msg));
+			}
+			else {
+				var string = dump(msg);	
+				presenceCount = presenceCount+1;
+					//if(presenceCount > 9) $('#presenceCountDNB').css('font-size',7).css('top','4px');
+					//else if(presenceCount > 99) $('#presenceCountDNB').css('font-size',5);	
+				var dataString = '<div class="wrapperTab"><div class=\"packageTitle\">Recieved PRESENCE package:</div>' + string + '</div>';
+				var dataStringHistory = '<div class=\"packageTitle\">Recieved PRESENCE package:</div>' + string;
+				var dataStringJQ = '<div id="presenceFade" class="ui-state-disabled">' + string + '</div>';
+				$('#presence').append(dataString);
+				$('#presenceJQ').html(dataStringJQ);
+				
+				$('#presenceCountDNB p').html(presenceCount);
+				$('#presenceFade').switchClass( "ui-state-disabled", 1500 );
+				$('#showPresencePackageHistory').css('display', 'block');
+				$('#showPresenceEventsHistory').css('display', 'block');
+				$('.presencePackagesJQ').append(dataStringHistory);
+				$('#presenceCountDNB').effect("bounce", { times:3 }, 250).css('display','block');
+			}
+		});
+		
+		Oyatel.Events.subscribe('/events/queue', function(msg) {
+			
+			if (msg.data.event == "fulldump") {
+				$('#fdQueueJQ').html(dump(msg));
+			}
+			else {
+				var string = dump(msg);	
+				queueCount = queueCount+1;
+					//if(queueCount > 9) $('#queueCountDNB').css('font-size',7).css('top','4px');
+					//else if(queueCount > 99) $('#queueCountDNB').css('font-size',5);
+				var dataString = '<div class="wrapperTab"><div class=\"packageTitle\">Recieved QUEUE package:</div>' + string + '</div>';
+				var dataStringHistory = '<div class=\"packageTitle\">Recieved QUEUE package:</div>' + string;
+				var dataStringJQ = '<div id="queueFade" class="ui-state-disabled">' + string + '</div>';
+				$('#queue').append(dataString);
+				$('#queueJQ').html(dataStringJQ);
+				$('#showQueuePackageHistory').css('display', 'block');
+				$('#showQueueEventsHistory').css('display', 'block');
+				$('#queueCountDNB p').html(queueCount);
+				$('#queueFade').switchClass( "ui-state-disabled", 1500 );
+				$('.queuePackagesJQ').append(dataStringHistory);
+				$('#queueCountDNB').effect("bounce", { times:3 }, 300).css('display','block');
+				//$('#queueCountDNB').css('position','absolute');
+			}
+		});
+		
+		Oyatel.Voicemail.mailbox(function(msg) {
+			$('#voicemailMailboxJQ').html(dump(msg));			
+			Oyatel.Voicemail.getMessages(msg.mailboxId, function(msg) {
+				$('#voicemailGetMessagesJQ').html(dump(msg));				
+			});
+		});
+		
+		Oyatel.User.currentUser(function(msg) {
+			//console.log('Oyatel.User.currentUser :', msg);
+			$('#userCurrentUserJQ').html(dump(msg));
+		});
+		
+	}
+	/*
+	$('#streamingAPIinfo').click(function() {
+		  alert('Streaming API');
+	});
+	/*
+	$('#eventInfo').click(function() {
+		  alert('Event');
+	});
+	*/
 	// setup GUI to show we are not authorized
 	function deauthorized() {
 		$('#connect .authorized').css('display', 'none');
 		$('#connect .not-authorized').css('display', 'block');
+		$('.mainContent').css('display', 'none');
 	}
 	
 	// $.Oyatel.Login.createButton('.btn-oyatel-login', 'normal');
@@ -193,10 +558,20 @@ $(document).ready(function() {
 	$('.oyatel-logout').click(function() {
 		Oyatel.deauthorize();
 	});
+	$('.foldCallEventsButton').click(function() {
+		$('#callEventsHistoryTab').css('height', '200px');
+	});
+	$('.foldCallpackageButton').click(function() {
+		$('#callPackageHistoryTab').css('height', '400px');
+	});
+	$('.foldPresenceEventsButton').click(function() {
+		$('#presenceEventsHistoryTab').css('height', '200px');
+	});
 	
 });
 
 </script>
-
+</div>
+</div>
 </body>
 </html>

@@ -206,6 +206,23 @@ Oyatel = function() {
 				}	
 			}()
 		},
+		Sms: function() {
+			return {				
+				senderIdentities: function(cb) {
+					_performRestRequest('https://rest.oyatel.com/sms/senderIdentities.json', null, cb);
+				},
+				send: function(destination_number, senderIdentity, copy_to_email, message, cb) {
+					//alert(post);
+					_performRestRequest('https://rest.oyatel.com/sms/send.json',
+							{
+							destination_number : destination_number, 
+							senderIdentity : senderIdentity,
+							copy_to_email : copy_to_email,
+							message : message
+							}, cb);
+				}
+			}
+		}(),
 		Call: function() {
 			return {
 				callback: function(params, cb) {

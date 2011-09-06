@@ -1,0 +1,85 @@
+
+body {
+    background-position: 50% 0;
+    color: #000000;
+    font-family: Arial,Helvetica,sans-serif;
+    font-size: 10px;
+    height: 100%;
+    line-height: 1.5;
+    overflow: auto;
+    width: 550px;
+}
+
+body, dd, dl, dt, form, h1, h2, h3, h4, h5, h6, li, ol, p, ul {
+    border: 0 none transparent;
+    clear: both;
+    margin: 0;
+    padding: 0;
+}
+
+	.smsMainContent {
+		width: 700px;
+		height: 500px;
+		position: relative;
+		float: left; 
+	}
+	
+	#connect .authorized {
+			display: none;
+			float: right;
+		}
+		
+	.btn-oyatel-login {
+		cursor: pointer;
+		width: 156px;
+		height: 24px;
+		background: url('../img/connect_with_oyatel-156-24.png') no-repeat;
+		float: right;
+	}
+	
+	.btn-oyatel-login span {
+		display: none;
+	}
+	
+	.headerOyatelLogo {
+		background: url('http://oyatel.com/templates/modelsite/images/Oyatel_logo.png') no-repeat;
+		height: 51px;
+	}	
+	
+	#msgSendSucces {
+		display: none;
+		color: #FF9933;
+		font-size: 12px;
+		margin-left: 189px;
+		margin-top: 10px;
+	}
+	
+	.msgSendError {
+		color: red;
+		font-size: 10px;
+		
+	}
+	
+	#emptyDestNumber {
+		display: none;
+		margin-left: 207px;
+	}
+	
+	#emptyMessage {
+		display: none;
+		margin-left: 230px;
+	}
+	
+.controls em {
+	vertical-align: top;
+	float: none;
+}
+
+.controls textarea {
+	width: 200px !important;
+}
+
+.controls #label {
+	width:191px !important;	
+}
+	

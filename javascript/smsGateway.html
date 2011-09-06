@@ -1,0 +1,205 @@
+<html>
+<head>
+
+<!-- <link type="text/css" href="css/styleOyatelAPI.custom.css" rel="stylesheet" /> -->
+<link type="text/css" href="css/custom-theme/jquery-ui-1.8.16.custom.css" rel="stylesheet" />
+<link type="text/css" href="css/smsGateway.css" rel="stylesheet" />
+<link type="text/css" href="css/form.css" rel="stylesheet" />
+<script type="text/javascript" src="js/jquery-1.6.2.min.js"></script>
+<script type="text/javascript" src="js/jquery-ui-1.8.16.custom.min.js"></script>
+<script type="text/javascript" src="js/jquery-ui-1.8.16.custom.min.js"></script>
+<script type="text/javascript" src="js/cometd.js"></script>
+<script type="text/javascript" src="js/jquery.cometd.js"></script>
+<script type="text/javascript" src="js/jquery.cookie.js"></script>
+<script type="text/javascript" src="js/jquery.json-2.2.js"></script>
+<script type="text/javascript" src="js/jquery.jsonp-2.1.4.min.js"></script>
+<script type="text/javascript" src="js/oyatelapi.js"></script>
+<script type="text/javascript" src="js/Oyatel.js"></script>
+<script type="text/javascript" src="js/jquery-blink.js"></script>
+<script type="text/javascript" src="js/jquery.validate.js"></script>
+<script type="text/javascript" src="js/jquery.highlight.js"></script>
+
+
+
+</head>
+<body>
+<!-- Header -->
+	<div class="headerOyatelLogo">
+		<div id="connect">
+			<div class="not-authorized">
+				<div class="btn-oyatel-login"><span>Connect with Oyatel</span></div>
+			</div>
+			<div class="authorized">
+				<div>Logged in as: <span class="oyatel-username"></span> <button class="oyatel-logout">Logout</button></div>
+			</div>
+		</div>
+	</div>
+	<div class="mainContent">
+	<div id="page">
+	<!--
+	<form id="smsForm">
+		<ul>
+			<li><div class="smsFrom"><p>From:</p></div></li>
+			<li><div class="smsTo"><p>To:</p></div></li>
+			<li><div class="smsTitle"><p>Message:</p></div></li>
+			<li><div class="smsMessageContent">
+				<textarea>[message content]</textarea>
+				<div class="smsSubmitButton">
+					<button class="smsSubmitButton">Send</button></div>
+				</div></li>
+			<li><div class="smsMailCopyOption">
+				<div class="smsCheckbox"></div>
+				<p>Send a copy to my e-mail address.<br />(user@example.com)</p>
+			</div></li>
+		</ul>	
+	</form> -->
+	
+	<div id="msgSendSucces"><p>Message has been sent.</p></div>
+	<form name="parameters" id="smsForm" method="post" action="smsGateway.html">
+					<fieldset style="border:none">
+				<ul class="controls">
+							<li class="">
+								<label for="dropdown">From</label>
+								<select class="select" id="dropdown" name="senderIdentity">
+									<!--
+									<option selected="selected" value=""></option>									
+									<option value="">- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - </option>
+									<option value="option 1">Number 1</option>
+									<option value="option 2">Number 2</option>
+									<option value="option 3">Number 3</option> -->
+								</select>
+							</li>
+							<li class="">
+							<label for="label">To:</label>
+							+
+							<input type="text" value="" maxlength="" class="required number digits text" id="label" name="destination_number">
+							<em>*</em>
+							<!-- <div id="emptyDestNumber" class="msgSendError">Please input destination number.</div> -->
+							</li>
+							<li class="">
+								<label for="multi-line">Message:</label>
+								<!-- <div id="emptyMessage" class="msgSendError">Please input message.</div> -->
+								
+								<textarea maxlength="" rows="4" class="textarea required" id="multi-line" name="message"></textarea>
+								<em>*</em>
+							</li>
+							
+							<!-- <li>
+								<label for="radio">Radio Buttons</label>
+								<fieldset id="radio">
+									<label><input type="radio" value="option 1" class="radio" id="controls-radio-1" name="controls[radio][]"> Option 1</label>
+									<label><input type="radio" value="option 2" class="radio" id="controls-radio-2" name="controls[radio][]"> Option 2</label>
+									<label><input type="radio" value="option 3" class="radio" id="controls-radio-3" name="controls[radio][]"> Option 3</label>
+								</fieldset>
+							</li> -->
+							<li>
+								<fieldset id="checkboxes">
+									<label><input type="checkbox" value="true" class="checkbox" checked="checked" id="" name="copy_to_email"> 
+									Send a copy to my e-mail address.<br />
+									<p id="userEmail"></p></label>									
+								</fieldset>
+							</li>
+							<li>
+								<!-- <input type="" value="Submit" class="button centered submitSms" name="Button"> -->
+								<button class="button centered submitSms">Send</button>
+							</li>
+					</ul>
+				</fieldset>
+				</form>
+			</div>	
+<script type="text/javascript">
+$(document).ready(function() {
+	Oyatel.init('d9a257d4-d48e-46f9-aa1f-361565c33f94', 'http://localhost/~jaceklawniczak/gitProject/oyatel-api-examples/javascript/oauth_cb.html');
+	
+	// Setup callbacks for deauth/auth-orization
+	Oyatel.bind('authorized', function() {
+		console.log('onAuthorized callback called');
+		authorized();
+	});
+	
+	Oyatel.bind('authorizationfailed', function(errormsg) {
+		console.log('The user rejected the authorization, or some error occured: ' + errormsg);
+	});
+	
+	Oyatel.bind('deauthorized', function() {
+		console.log('onDeauthorized callback called');
+		deauthorized();
+	});
+	
+	$("#smsForm").validate();
+	
+	//$('#smsForm').form.highlight();
+	
+
+	
+	Oyatel.checkAuthorization();
+	
+		// setup GUI to show we are authorized and start listening to events
+		function authorized() {
+				console.log('calling authorized');
+				
+				//Sms callbacks
+				Oyatel.Sms.senderIdentities(function(msg) {
+					console.log('senderIdentities:', msg);	
+					var string = '<option selected="selected" value="' +  msg.identities[0].displayName + '">' +  msg.identities[0].displayName + '</option>';
+					$('#dropdown').html(string);
+					senderIdentity = msg.identities[0].displayName;
+				});
+				
+				
+				
+				$('#connect .authorized').css('display', 'block');
+				$('#connect .not-authorized').css('display', 'none');
+				$('.mainContent').css('display', 'block');
+											
+				Oyatel.User.currentUser(function(msg) {
+					console.log('Oyatel.User.currentUser :', msg);
+					$('#userEmail').html('(' + msg.email + ')');
+				});
+				
+				
+				// get ME info...
+				Oyatel.User.currentUser(function(user) {
+				$('.oyatel-username').html(user.username + ' (' + user.firstname + ' ' + user.lastname + ')');
+				});
+			}
+		
+			// setup GUI to show we are not authorized
+				function deauthorized() {
+					$('#connect .authorized').css('display', 'none');
+					$('#connect .not-authorized').css('display', 'block');
+					$('.mainContent').css('display', 'none');
+				}
+			
+			// $.Oyatel.Login.createButton('.btn-oyatel-login', 'normal');
+			
+				$('.btn-oyatel-login').click(function() {
+					Oyatel.authorize();
+				});
+				$('.oyatel-logout').click(function() {
+					Oyatel.deauthorize();
+				});
+				
+				
+				$('#smsForm').submit(function() {	
+					
+					var destination_number = "+" + $('#smsForm input[name="destination_number"]').val(); //: string (Format: +4791770994 E.164)
+					var senderIdentity = $('#smsForm select[name=senderIdentity]').val(); //: string (@see senderNames())
+					var copy_to_email = $('#smsForm input[name="copy_to_email"]:checked').length; //: boolean
+					var message = $('#smsForm textarea[name="message"]').val(); //: string					
+					
+					if(destination_number != "" && message != "") {
+					
+						Oyatel.Sms.send(destination_number, senderIdentity, copy_to_email, message, function(msg) {
+							console.log('sms_id:', msg);	
+							if (!msg) alert('Technical issues. Please try later.');
+							else $('#msgSendSucces').css('display', 'block');
+						});					
+					}					
+					return false;
+				});
+});
+</script>
+</div>
+</body>
+</html>
