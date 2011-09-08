@@ -198,8 +198,7 @@ Oyatel = function() {
 			return {
 				
 				callflows: function(did, cb) {
-					params = params || {};
-					_performRestRequest('https://rest.oyatel.com/did/callflows/' + did + '.json', params, cb);
+					_performRestRequest('https://rest.oyatel.com/did/callflows/' + did + '.json', null, cb);
 				},
 				setActiveCallflow: function(did, params, cb) {
 					params = params || {};
@@ -207,14 +206,14 @@ Oyatel = function() {
 					_performRestRequest('https://rest.oyatel.com/did/setActiveCallflow/' + did + '.json', params, cb);
 				},
 				callForward: function(did, cb) {
-					_performRestRequest('https://rest.oyatel.com/did/callForward/' + did + '.json', params, cb);
+					_performRestRequest('https://rest.oyatel.com/did/callForward/' + did + '.json', null, cb);
 				},
 				setCallForward: function(did, params, cb) {
 					params = params || {};
 					_performRestRequest('https://rest.oyatel.com/did/setCallForward/' + did + '.json', params, cb);
 				},
 				removeCallForward: function(did, cb) {
-					_performRestRequest('https://rest.oyatel.com/did/removeCallForward/' + did + '.json', params, cb);
+					_performRestRequest('https://rest.oyatel.com/did/removeCallForward/' + did + '.json', null, cb);
 				}
 				
 			}
