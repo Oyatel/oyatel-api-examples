@@ -139,10 +139,7 @@ $(document).ready(function() {
 				Oyatel.Sms.senderIdentities(function(msg) {
 					
 					$.each(msg.identities, function (i, identity) {
-						$('#dropdown').append($('<option/>'), {
-							value: identity.senderIdentity,
-							text: identity.displayName
-						});						
+						$('#dropdown').append( $('<option/>').val(identity.senderIdentity).html(identity.displayName) );
 					})
 				});
 				
