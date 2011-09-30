@@ -136,11 +136,14 @@ $(document).ready(function() {
 		// setup GUI to show we are authorized and start listening to events
 		function authorized() {				
 				//Sms callbacks
-				Oyatel.Sms.senderIdentities(function(msg) {					
-					for (var i = 0; i < msg.identities.length; i++) {
-						var identity = msg.identities[i];
-						$('<option />').attr('value', identity.senderIdentity).val(identity.displayName).appendTo($('#dropdown'));
-					}
+				Oyatel.Sms.senderIdentities(function(msg) {
+					
+					$.each(msg.identities, function (i, identity) {
+						$('#dropdown').append($('<option/>'), {
+							value: identity.senderIdentity,
+							text: identity.displayName
+						});						
+					})
 				});
 				
 				
