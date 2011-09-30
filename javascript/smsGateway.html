@@ -113,16 +113,15 @@ $(document).ready(function() {
 	
 	// Setup callbacks for deauth/auth-orization
 	Oyatel.bind('authorized', function() {
-		console.log('onAuthorized callback called');
 		authorized();
 	});
 	
 	Oyatel.bind('authorizationfailed', function(errormsg) {
-		console.log('The user rejected the authorization, or some error occured: ' + errormsg);
+
 	});
 	
 	Oyatel.bind('deauthorized', function() {
-		console.log('onDeauthorized callback called');
+
 		deauthorized();
 	});
 	
@@ -135,15 +134,13 @@ $(document).ready(function() {
 	Oyatel.checkAuthorization();
 	
 		// setup GUI to show we are authorized and start listening to events
-		function authorized() {
-				console.log('calling authorized');
-				
+		function authorized() {				
 				//Sms callbacks
-				Oyatel.Sms.senderIdentities(function(msg) {
-					console.log('senderIdentities:', msg);	
-					var string = '<option selected="selected" value="' +  msg.identities[0].displayName + '">' +  msg.identities[0].displayName + '</option>';
-					$('#dropdown').html(string);
-					senderIdentity = msg.identities[0].displayName;
+				Oyatel.Sms.senderIdentities(function(msg) {					
+					for (var i = 0; i < msg.identities.length; i++) {
+						var identity = msg.identities[i];
+						$('<option />').attr('value', identity.senderIdentity).val(identity.displayName).appendTo($('#dropdown'));
+					}
 				});
 				
 				
@@ -153,7 +150,7 @@ $(document).ready(function() {
 				$('.mainContent').css('display', 'block');
 											
 				Oyatel.User.currentUser(function(msg) {
-					console.log('Oyatel.User.currentUser :', msg);
+
 					$('#userEmail').html('(' + msg.email + ')');
 				});
 				
@@ -191,7 +188,7 @@ $(document).ready(function() {
 					if(destination_number != "" && message != "") {
 					
 						Oyatel.Sms.send(destination_number, senderIdentity, copy_to_email, message, function(msg) {
-							console.log('sms_id:', msg);	
+
 							if (!msg) alert('Technical issues. Please try later.');
 							else $('#msgSendSucces').css('display', 'block');
 						});					
