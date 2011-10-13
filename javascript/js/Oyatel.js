@@ -128,7 +128,7 @@ Oyatel = function() {
 			
 			var url = 'https://oauth.oyatel.com/oauth/authorize?client_id=' + oauth_client_id + '&response_type=token&redirect_uri=' + oauth_redirect_uri;
 			var w = window.open(url,'auth_popup','width=840,height=550,scrollbars=0');
-			if (!w) {
+			if (!w) { // popup-blocker or the alike
 				window.location = url;
 			}
 		},
@@ -175,8 +175,14 @@ Oyatel = function() {
 				getMessages: function(vboxId, cb) {
 					_performRestRequest('https://rest.oyatel.com/voicemail/getMessages/' + vboxId + '.json', null, cb);	
 				},
+				markMessageAsRead: function(voicemailMessageId, cb) {
+					_performRestRequest('https://rest.oyatel.com/voicemail/markMessageAsRead/' + voicemailMessageId + '.json', {}, cb);
+				},
+				deleteMessage: function(voicemailMessageId, cb) {
+					_performRestRequest('https://rest.oyatel.com/voicemail/deleteMessage/' + voicemailMessageId + '.json', {}, cb);
+				},
 				getMessageRecordingURL: function(messageId, format) {
-					var format = format || 'wav';
+					var format = format || 'mp3';
 					return _getRestRequestUri('https://rest.oyatel.com/voicemail/getMessageRecording/' + messageId + '.' + format + '/');
 				}
 			}
@@ -236,30 +242,28 @@ Oyatel = function() {
 					_performRestRequest('https://rest.oyatel.com/sms/senderIdentities.json', null, cb);
 				},
 				send: function(destination_number, senderIdentity, copy_to_email, message, cb) {
-					//alert(post);
-					_performRestRequest('https://rest.oyatel.com/sms/send.json',
-							{
-							destination_number : destination_number, 
-							senderIdentity : senderIdentity,
-							copy_to_email : copy_to_email,
-							message : message
-							}, cb);
+					_performRestRequest('https://rest.oyatel.com/sms/send.json', {
+						destination_number : destination_number, 
+						senderIdentity : senderIdentity,
+						copy_to_email : copy_to_email,
+						message : message
+					}, cb);
 				}
 			}
 		}(),
 		Call: function() {
 			return {
 				callback: function(params, cb) {
-                                        if (!params.destination) {
-                                                throw "destination must be set as a parameter for callback";
-                                        }
+					if (!params.destination) {
+						throw "destination must be set as a parameter for callback";
+					}
 					_performRestRequest('https://rest.oyatel.com/call/callback.json', params, cb);
 				},
 				numberInfo: function(number, cb) {
-                                        if (!number) {
-                                                throw "number must be set as a parameter for callback";
-                                        }
-					_performRestRequest('https://magnusdev.oyatel.com/rest/call/numberInfo.json', {
+					if (!number) {
+						throw "number must be set as a parameter for callback";
+					}
+					_performRestRequest('https://rest.oyatel.com/call/numberInfo.json', {
 						number: number
 					}, cb);
 				}
