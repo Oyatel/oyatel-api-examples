@@ -17,7 +17,7 @@ Oyatel = function() {
 	
 	var _cometdServerUri = 'https://api.oyatel.com/cometd/';
 	var oyaStreamingService;
-		
+	
 	_getAccessToken = function() {
 		return $.cookie('oyatel_access');
 	};
@@ -28,28 +28,40 @@ Oyatel = function() {
 	_getRestRequestUri = function(url) {
 		return [url, '?oauth_token=', _getAccessToken()].join('');
 	}
-	_performRestRequest = function(url, data, cb) {	
-		// console.log('Performing request to: ' + [_getRestRequestUri(url), '&callback=?'].join(''));
-
+	_performRestRequest = function(url, data, successcb, errorcb) {	
 		$.jsonp({
 			url: [_getRestRequestUri(url), '&callback=?'].join(''),
 			data: data,
-			success: function(data) {
+			success: $.proxy(function(data) {
 				// check for error in json return
-				if (data.errorcode && data.errorcode == "auth") {
-					// console.log("Got auth error, show login screen");
+				if (data.status_code && data.status_code == 400) {
+					// we have an error, call the errorcallback
+					var errorObj = {
+						error_code: data.error_code,
+						error_description: data.error_description
+					};
+					var hasHandledError = false;
+					if (typeof(errorcb) == 'function')
+						if (errorcb(data))
+							hasHandledError = true;
+					
+					// notify global error handlers that the issue has been handled by the callback
+					errorObj.hasBeenHandled = hasHandledError;
+					$(Oyatel).trigger('error', errorObj, data);
+					
+				} else if (data.errorcode && data.errorcode == "auth") {
+					// Got auth error, show login screen
 					Oyatel.deauthorize();
 				} else {
-					// console.log("Data is: " , data);
-					cb(data);
+					if (typeof(successcb) == 'function')
+						successcb(data);
 				}
-			},
+			}, this),
 			error: function(xOptions, statusText) {
-				// console.log('Request failed for some reason...', );
-				console.log('Failed! Invalid access token, ', xOptions, statusText);
+				console.log('Failed! Invalid access token?', xOptions, statusText);
 			}
 		});
-	}
+	};
 	
 	_initStreamingServer = function() {
 		if (!streaming_inited) {
@@ -107,7 +119,7 @@ Oyatel = function() {
 			});
 		},
 		bind: function(eventName, callback) {
-			$(this).bind(eventName, callback);
+			return $(this).bind(eventName, callback);
 		},
 		getAccessToken: _getAccessToken,
 		wasAuthorized: function(access_token, expires) {
@@ -145,10 +157,21 @@ Oyatel = function() {
 			$(this).trigger("deauthorized");
 		},
 		
+		/* 
+		 * Implementation of Oyatel API Error Codes
+		 */
+		ErrorCode: {
+			WARNING_NUMBER_FORMAT: 200,
+			ERROR_NUMBER_FORMAT: 201
+		},
+		
+		/*
+		 * Implementation of Streaming API functionality
+		 * @see http://dev.oyatel.com/documentation/streaming-api/
+		 */
 		Events: function() {
 			return {
 				subscribe: function(channel, callback) {
-					// console.log('Adding subscribe for: ' + channel);
 					_initStreamingServer();
 					if (!_streaming_connected) {
 						_scheduledSubscriptions.push([channel, callback]);
@@ -159,27 +182,31 @@ Oyatel = function() {
 				}
 			}
 		}(),
+		
+		/*
+		 * Implementation of various REST API calls
+		 * @see http://dev.oyatel.com/documentation/api-oyatel-rest-api/
+		 */
 		User: function() {
 			return {
-				currentUser: function(cb) {
-					// console.log('cheking current user');
-					_performRestRequest('https://rest.oyatel.com/account/me.json', null, cb);
+				currentUser: function(cb, errorcb) {
+					_performRestRequest('https://rest.oyatel.com/account/me.json', null, cb, errorcb);
 				}
 			}
 		}(),
 		Voicemail: function() {
 			return {
-				mailbox: function(cb) {
-					_performRestRequest('https://rest.oyatel.com/voicemail/mailboxForUser/', null, cb);
+				mailbox: function(cb, errorcb) {
+					_performRestRequest('https://rest.oyatel.com/voicemail/mailboxForUser/', null, cb, errorcb);
 				},
-				getMessages: function(vboxId, cb) {
-					_performRestRequest('https://rest.oyatel.com/voicemail/getMessages/' + vboxId + '.json', null, cb);	
+				getMessages: function(vboxId, cb, errorcb) {
+					_performRestRequest('https://rest.oyatel.com/voicemail/getMessages/' + vboxId + '.json', null, cb, errorcb);	
 				},
-				markMessageAsRead: function(voicemailMessageId, cb) {
-					_performRestRequest('https://rest.oyatel.com/voicemail/markMessageAsRead/' + voicemailMessageId + '.json', {}, cb);
+				markMessageAsRead: function(voicemailMessageId, cb, errorcb) {
+					_performRestRequest('https://rest.oyatel.com/voicemail/markMessageAsRead/' + voicemailMessageId + '.json', {}, cb, errorcb);
 				},
-				deleteMessage: function(voicemailMessageId, cb) {
-					_performRestRequest('https://rest.oyatel.com/voicemail/deleteMessage/' + voicemailMessageId + '.json', {}, cb);
+				deleteMessage: function(voicemailMessageId, cb, errorcb) {
+					_performRestRequest('https://rest.oyatel.com/voicemail/deleteMessage/' + voicemailMessageId + '.json', {}, cb, errorcb);
 				},
 				getMessageRecordingURL: function(messageId, format) {
 					var format = format || 'mp3';
@@ -190,36 +217,36 @@ Oyatel = function() {
 		Queue: function() {
 			return {
 				
-				getQueues: function(cb) {
-					_performRestRequest('https://rest.oyatel.com/queue/getQueues.json', null, cb);
+				getQueues: function(cb, errorcb) {
+					_performRestRequest('https://rest.oyatel.com/queue/getQueues.json', null, cb, errorcb);
 				},
-				setQueueMemberships: function(queueIds, cb) {
+				setQueueMemberships: function(queueIds, cb, errorcb) {
 					_performRestRequest('https://rest.oyatel.com/queue/setQueueMemberships.json', {
 						queueIds: queueIds
-					}, cb);
+					}, cb, errorcb);
 				}
 			}
 		}(),
 		Did: function() {
 			return {
 				
-				callflows: function(did, cb) {
-					_performRestRequest('https://rest.oyatel.com/did/callflows/' + did + '.json', null, cb);
+				callflows: function(did, cb, errorcb) {
+					_performRestRequest('https://rest.oyatel.com/did/callflows/' + did + '.json', null, cb, errorcb);
 				},
-				setActiveCallflow: function(did, params, cb) {
+				setActiveCallflow: function(did, params, cb, errorcb) {
 					params = params || {};
 					// check that params include callflowId
-					_performRestRequest('https://rest.oyatel.com/did/setActiveCallflow/' + did + '.json', params, cb);
+					_performRestRequest('https://rest.oyatel.com/did/setActiveCallflow/' + did + '.json', params, cb, errorcb);
 				},
-				callForward: function(did, cb) {
-					_performRestRequest('https://rest.oyatel.com/did/callForward/' + did + '.json', null, cb);
+				callForward: function(did, cb, errorcb) {
+					_performRestRequest('https://rest.oyatel.com/did/callForward/' + did + '.json', null, cb, errorcb);
 				},
-				setCallForward: function(did, params, cb) {
+				setCallForward: function(did, params, cb, errorcb) {
 					params = params || {};
-					_performRestRequest('https://rest.oyatel.com/did/setCallForward/' + did + '.json', params, cb);
+					_performRestRequest('https://rest.oyatel.com/did/setCallForward/' + did + '.json', params, cb, errorcb);
 				},
-				removeCallForward: function(did, cb) {
-					_performRestRequest('https://rest.oyatel.com/did/removeCallForward/' + did + '.json', null, cb);
+				removeCallForward: function(did, cb, errorcb) {
+					_performRestRequest('https://rest.oyatel.com/did/removeCallForward/' + did + '.json', null, cb, errorcb);
 				}
 				
 			}
@@ -238,34 +265,34 @@ Oyatel = function() {
 		},
 		Sms: function() {
 			return {				
-				senderIdentities: function(cb) {
-					_performRestRequest('https://rest.oyatel.com/sms/senderIdentities.json', null, cb);
+				senderIdentities: function(cb, errorcb) {
+					_performRestRequest('https://rest.oyatel.com/sms/senderIdentities.json', null, cb, errorcb);
 				},
-				send: function(destination_number, senderIdentity, copy_to_email, message, cb) {
+				send: function(destination_number, senderIdentity, copy_to_email, message, cb, errorcb) {
 					_performRestRequest('https://rest.oyatel.com/sms/send.json', {
 						destination_number : destination_number, 
 						senderIdentity : senderIdentity,
 						copy_to_email : copy_to_email,
 						message : message
-					}, cb);
+					}, cb, errorcb);
 				}
 			}
 		}(),
 		Call: function() {
 			return {
-				callback: function(params, cb) {
+				callback: function(params, cb, errorcb) {
 					if (!params.destination) {
 						throw "destination must be set as a parameter for callback";
 					}
-					_performRestRequest('https://rest.oyatel.com/call/callback.json', params, cb);
+					_performRestRequest('https://rest.oyatel.com/call/callback.json', params, cb, errorcb);
 				},
-				numberInfo: function(number, cb) {
+				numberInfo: function(number, cb, errorcb) {
 					if (!number) {
 						throw "number must be set as a parameter for callback";
 					}
 					_performRestRequest('https://rest.oyatel.com/call/numberInfo.json', {
 						number: number
-					}, cb);
+					}, cb, errorcb);
 				}
 			}
 		}()
