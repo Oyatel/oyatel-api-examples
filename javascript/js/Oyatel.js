@@ -171,6 +171,9 @@ Oyatel = function() {
 		 */
 		Events: function() {
 			return {
+				/**
+				 * @return int subscriptionId
+				 */
 				subscribe: function(channel, callback) {
 					_initStreamingServer();
 					if (!_streaming_connected) {
@@ -178,7 +181,14 @@ Oyatel = function() {
 					} else {
 						var subscription = oyaStreamingService.addListener(channel, callback);
 						_subscriptions.push(subscription);
+						return subscription;
 					}
+				},
+				/**
+				 * @param int subscriptionId obtained from Oyatel.Events.Call
+				 */
+				unsubscribe: function(subscriptionId) {
+					oyaStreamingService.removeListener(subscriptionId);
 				}
 			}
 		}(),
