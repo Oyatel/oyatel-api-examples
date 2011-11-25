@@ -81,13 +81,17 @@ Oyatel = function() {
 
 				for (var i = 0; i < _scheduledSubscriptions.length; i++) {
 					var scheduledSubscription = _scheduledSubscriptions[i];
-					var subscriptionSuccessCallback = scheduledSubscription[3];
+					var subscriptionSuccessCallback = null;
+					if (scheduledSubscription.length >= 3) {
+						subscriptionSuccessCallback = scheduledSubscription[2];
+					}
 					scheduledSubscription.pop(); // pop of our own element
 					
 					var subscription = oyaStreamingService.addListener.apply(this, scheduledSubscription);
 					_subscriptions.push(subscription);
-					
-					subscriptionSuccessCallback(subscription);
+					if (subscriptionSuccessCallback) {
+						subscriptionSuccessCallback(subscription);
+					}
 				}
 				_scheduledSubscriptions = [];
 			}, function() {
