@@ -80,8 +80,14 @@ Oyatel = function() {
 				_streaming_connecting = false;
 
 				for (var i = 0; i < _scheduledSubscriptions.length; i++) {
-					var subscription = oyaStreamingService.addListener.apply(this, _scheduledSubscriptions[i]);
+					var scheduledSubscription = _scheduledSubscriptions[i];
+					var subscriptionSuccessCallback = scheduledSubscription[3];
+					scheduledSubscription.pop(); // pop of our own element
+					
+					var subscription = oyaStreamingService.addListener.apply(this, scheduledSubscription);
 					_subscriptions.push(subscription);
+					
+					subscriptionSuccessCallback(subscription);
 				}
 				_scheduledSubscriptions = [];
 			}, function() {
@@ -172,23 +178,26 @@ Oyatel = function() {
 		Events: function() {
 			return {
 				/**
+				 * @param string channel The name/path of the event-channel to subscribe to
+				 * @param function callback(data) The function to call when events are received
+				 * @param function subscribedCallback(subscriptionObj) The function to call when the subscription is confirmed.
 				 * @return int subscriptionId
 				 */
-				subscribe: function(channel, callback) {
+				subscribe: function(channel, callback, subscribedCallback) {
 					_initStreamingServer();
 					if (!_streaming_connected) {
-						_scheduledSubscriptions.push([channel, callback]);
+						_scheduledSubscriptions.push([channel, callback, subscribedCallback]);
 					} else {
-						var subscription = oyaStreamingService.addListener(channel, callback);
-						_subscriptions.push(subscription);
-						return subscription;
+						var subscriptionObj = oyaStreamingService.addListener(channel, callback);
+						_subscriptions.push(subscriptionObj);
+						subscribedCallback(subscriptionObj);
 					}
 				},
 				/**
 				 * @param int subscriptionId obtained from Oyatel.Events.Call
 				 */
-				unsubscribe: function(subscriptionId) {
-					oyaStreamingService.removeListener(subscriptionId);
+				unsubscribe: function(subscriptionObj) {
+					oyaStreamingService.removeListener(subscriptionObj);
 				}
 			}
 		}(),
