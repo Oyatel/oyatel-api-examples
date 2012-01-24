@@ -21,9 +21,13 @@ Oyatel = function() {
 	_getAccessToken = function() {
 		return $.cookie('oyatel_access');
 	};
+	/**
+	 * @param string val The access token
+	 * @param int expire The time in sessions till the token expires
+	 */
 	_setAccessToken = function(val, expire) {
 		var d = new Date();
-		d.setTime(d.getTime() + expire);
+		d.setTime(d.getTime() + expire * 1000);
 		$.cookie('oyatel_access', val, {expires: d});
 	};
 	
