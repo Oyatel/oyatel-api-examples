@@ -22,7 +22,9 @@ Oyatel = function() {
 		return $.cookie('oyatel_access');
 	};
 	_setAccessToken = function(val, expire) {
-		$.cookie('oyatel_access', val, {expires: expire});
+		var d = new Date();
+		d.setTime(d.getTime() + expire);
+		$.cookie('oyatel_access', val, {expires: d});
 	};
 	
 	_getRestRequestUri = function(url) {
