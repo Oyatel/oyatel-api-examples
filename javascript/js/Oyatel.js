@@ -27,6 +27,10 @@ Oyatel = function() {
 	 */
 	_setAccessToken = function(val, expire) {
 		var d = new Date();
+		if (isNaN(expire)) {
+			// default expire time is 30 days
+			expire = 2592000;
+		}
 		d.setTime(d.getTime() + expire * 1000);
 		$.cookie('oyatel_access', val, {expires: d});
 	};
