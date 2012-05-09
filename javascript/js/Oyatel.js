@@ -208,7 +208,7 @@ Oyatel = function() {
 					} else {
 						var subscriptionObj = oyaStreamingService.addListener(channel, callback);
 						_subscriptions.push(subscriptionObj);
-						if (_isFunction(subscribedCallback))) {
+						if (_isFunction(subscribedCallback)) {
 							subscribedCallback(subscriptionObj);
 						}
 					}
