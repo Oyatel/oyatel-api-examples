@@ -117,7 +117,11 @@ Oyatel = function() {
 			oyaStreamingService.disconnect();
 		}
 	}
-	
+	_isFunction = function(functionToCheck) {
+		var getType = {};
+		return functionToCheck && getType.toString.call(functionToCheck) == '[object Function]';
+	}
+
 	return {
 		/** Only for testing, not PUBLIC API **/
 		_getStreamingServerObj: function() {
@@ -204,7 +208,9 @@ Oyatel = function() {
 					} else {
 						var subscriptionObj = oyaStreamingService.addListener(channel, callback);
 						_subscriptions.push(subscriptionObj);
-						subscribedCallback(subscriptionObj);
+						if (_isFunction(subscribedCallback))) {
+							subscribedCallback(subscriptionObj);
+						}
 					}
 				},
 				/**
