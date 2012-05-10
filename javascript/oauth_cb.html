@@ -24,7 +24,7 @@ function checkReponse() {
 	var fragment = unescape(self.document.location.hash.substring(1));
 	
 	// now get token, expire etc. from fragment
-	var parts = fragment.split(/^access_token=(.*?)&expires_in=(.*?)&scope=(.*)$/);
+	var parts = /^access_token=(.*?)&expires_in=(.*?)&scope=([^&]*).*$/.exec(fragment);
 	var access_token = parts[1];
 	var expires_in = parts[2];
 	var scope = parts[3];
