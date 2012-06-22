@@ -11,6 +11,7 @@ Oyatel = function() {
 	var oauth_redirect_uri;
 	var streaming_inited = false;
 	var _streaming_connected = false;
+	var _cookieTokenDisabled = false;
 	var _streaming_connecting = false;
 	var _subscriptions = [];
 	var _scheduledSubscriptions = [];
@@ -19,20 +20,28 @@ Oyatel = function() {
 	var oyaStreamingService;
 	
 	_getAccessToken = function() {
-		return $.cookie('oyatel_access');
+		if (_cookieTokenDisabled) {
+			return _accessToken;
+		} else {
+			return $.cookie('oyatel_access');
+		}
 	};
 	/**
 	 * @param string val The access token
 	 * @param int expire The time in sessions till the token expires
 	 */
 	_setAccessToken = function(val, expire) {
-		var d = new Date();
-		if (isNaN(expire)) {
-			// default expire time is 30 days
-			expire = 2592000;
+		if (_cookieTokenDisabled) {
+			_accessToken = val; // only valid for this load
+		} else {
+			var d = new Date();
+			if (isNaN(expire)) {
+				// default expire time is 30 days
+				expire = 2592000;
+			}
+			d.setTime(d.getTime() + expire * 1000);
+			$.cookie('oyatel_access', val, {expires: d});
 		}
-		d.setTime(d.getTime() + expire * 1000);
-		$.cookie('oyatel_access', val, {expires: d});
 	};
 	
 	_getRestRequestUri = function(url) {
@@ -135,6 +144,13 @@ Oyatel = function() {
 				_cometdServerUri = cometdServerUri;
 			}
 		},
+		/** 
+		 * Used to have more control over the mechanism to authorize
+		 * with OAuth access token in the API.
+		 */
+		disableAuthCookie: function() {
+			_cookieTokenDisabled = true;
+		},
 		checkAuthorization: function() {
 			// check "me" with the cookie
 			wasAuth = this.wasAuthorized;
@@ -146,6 +162,17 @@ Oyatel = function() {
 			return $(this).bind(eventName, callback);
 		},
 		getAccessToken: _getAccessToken,
+		/** 
+		 * Used to control access token only for session. 
+		 * Can only be used when auth cookie is disabled.
+		 * @see Oyatel.disableAuthCookie()
+	  	 */
+		setAccessToken: function(token) {
+			if (!_cookieTokenDisabled) {
+				throw 'Oyatel.setAccessToken can only be used when cookie auth is disabled';
+			}
+			_accessToken = token;
+		},
 		wasAuthorized: function(access_token, expires) {
 			_setAccessToken(access_token, expires);
 			_isAuthorized = true;
