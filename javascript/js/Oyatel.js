@@ -14,7 +14,7 @@ Oyatel = function() {
 	var _streaming_connecting = false;
 	var _subscriptions = [];
 	var _scheduledSubscriptions = [];
-	
+	var _isAuthorized = false;
 	var _cometdServerUri = 'https://api.oyatel.com/cometd/';
 	var oyaStreamingService;
 	
@@ -148,10 +148,13 @@ Oyatel = function() {
 		getAccessToken: _getAccessToken,
 		wasAuthorized: function(access_token, expires) {
 			_setAccessToken(access_token, expires);
+			_isAuthorized = true;
 			
 			$(Oyatel).trigger("authorized");
 		},
 		authorizationFailed: function(errorcode, errormsg) {
+			_isAuthorized = false;
+
 			$(this).trigger("authorizationfailed", {
 				code: errorcode,
 				msg: errormsg
@@ -169,6 +172,8 @@ Oyatel = function() {
 			}
 		},
 		deauthorize: function() {
+			_isAuthorized = false;
+
 			// log off Streaming API
 			_disconnectStreamingServer();
 			
@@ -202,7 +207,10 @@ Oyatel = function() {
 				 * @return int subscriptionId
 				 */
 				subscribe: function(channel, callback, subscribedCallback) {
-					_initStreamingServer();
+					if (_isAuthorized) {
+						// only handshake to server if we are authorized
+						_initStreamingServer();
+					}
 					if (!_streaming_connected) {
 						_scheduledSubscriptions.push([channel, callback, subscribedCallback]);
 					} else {
