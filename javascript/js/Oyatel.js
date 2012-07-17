@@ -149,6 +149,9 @@ Oyatel = function() {
 				_cometdServerUri = cometdServerUri;
 			}
 		},
+		setAssumeUserId: function(userId) {
+			_assumedUserId = userId;
+		},
 		/** 
 		* Used to have more control over the mechanism to authorize
 		* with OAuth access token in the API.
