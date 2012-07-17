@@ -1,3 +1,5 @@
+/*jslint browser: true, nomen: true, jquery: true */
+
 /**
  * Oyatel API class
  * Handles authorization, streaming-api connection and REST calls with JSONP
@@ -7,19 +9,21 @@
 
 (function($) {
 Oyatel = function() {
-	var oauth_client_id;
-	var oauth_redirect_uri;
-	var streaming_inited = false;
-	var _streaming_connected = false;
-	var _cookieTokenDisabled = false;
-	var _streaming_connecting = false;
-	var _subscriptions = [];
-	var _scheduledSubscriptions = [];
-	var _isAuthorized = false;
-	var _cometdServerUri = 'https://api.oyatel.com/cometd/';
-	var oyaStreamingService;
+	var oauth_client_id,
+		oauth_redirect_uri,
+		streaming_inited = false,
+		_accessToken,
+		_streaming_connected = false,
+		_cookieTokenDisabled = false,
+		_streaming_connecting = false,
+		_subscriptions = [],
+		_scheduledSubscriptions = [],
+		_isAuthorized = false,
+		_cometdServerUri = 'https://api.oyatel.com/cometd/',
+		_assumedUserId,
+		oyaStreamingService;
 	
-	_getAccessToken = function() {
+	var _getAccessToken = function() {
 		if (_cookieTokenDisabled) {
 			return _accessToken;
 		} else {
@@ -27,10 +31,10 @@ Oyatel = function() {
 		}
 	};
 	/**
-	 * @param string val The access token
-	 * @param int expire The time in sessions till the token expires
-	 */
-	_setAccessToken = function(val, expire) {
+	* @param string val The access token
+	* @param int expire The time in sessions till the token expires
+	*/
+	var _setAccessToken = function(val, expire) {
 		if (_cookieTokenDisabled) {
 			_accessToken = val; // only valid for this load
 		} else {
@@ -44,10 +48,11 @@ Oyatel = function() {
 		}
 	};
 	
-	_getRestRequestUri = function(url) {
-		return [url, '?oauth_token=', _getAccessToken()].join('');
-	}
-	_performRestRequest = function(url, data, successcb, errorcb) {	
+	var _getRestRequestUri = function(url) {
+		var assumeString = _assumedUserId ? '&assume_user_id=' + _assumedUserId : '';
+		return [url, '?oauth_token=', _getAccessToken(), assumeString].join('');
+	};
+	var _performRestRequest = function(url, data, successcb, errorcb) {	
 		$.jsonp({
 			url: [_getRestRequestUri(url), '&callback=?'].join(''),
 			data: data,
@@ -82,7 +87,7 @@ Oyatel = function() {
 		});
 	};
 	
-	_initStreamingServer = function() {
+	var _initStreamingServer = function() {
 		if (!streaming_inited) {
 			oyaStreamingService = new com.oyatel.Service({
 				url: _cometdServerUri
@@ -119,17 +124,17 @@ Oyatel = function() {
 			}, authConfig);
 		}
 	};
-	_disconnectStreamingServer = function() {
+	var _disconnectStreamingServer = function() {
 		if (streaming_inited) {
 			_streaming_connected = false;
 			_subscriptions = [];
 			oyaStreamingService.disconnect();
 		}
-	}
-	_isFunction = function(functionToCheck) {
+	};
+	var _isFunction = function(functionToCheck) {
 		var getType = {};
 		return functionToCheck && getType.toString.call(functionToCheck) == '[object Function]';
-	}
+	};
 
 	return {
 		/** Only for testing, not PUBLIC API **/
@@ -145,15 +150,15 @@ Oyatel = function() {
 			}
 		},
 		/** 
-		 * Used to have more control over the mechanism to authorize
-		 * with OAuth access token in the API.
-		 */
+		* Used to have more control over the mechanism to authorize
+		* with OAuth access token in the API.
+		*/
 		disableAuthCookie: function() {
 			_cookieTokenDisabled = true;
 		},
 		checkAuthorization: function() {
 			// check "me" with the cookie
-			wasAuth = this.wasAuthorized;
+			var wasAuth = this.wasAuthorized;
 			Oyatel.User.currentUser(function() {
 				wasAuth(_getAccessToken());
 			});
@@ -163,10 +168,10 @@ Oyatel = function() {
 		},
 		getAccessToken: _getAccessToken,
 		/** 
-		 * Used to control access token only for session. 
-		 * Can only be used when auth cookie is disabled.
-		 * @see Oyatel.disableAuthCookie()
-	  	 */
+		* Used to control access token only for session. 
+		* Can only be used when auth cookie is disabled.
+		* @see Oyatel.disableAuthCookie()
+		*/
 		setAccessToken: function(token) {
 			if (!_cookieTokenDisabled) {
 				throw 'Oyatel.setAccessToken can only be used when cookie auth is disabled';
@@ -214,25 +219,25 @@ Oyatel = function() {
 		},
 		
 		/* 
-		 * Implementation of Oyatel API Error Codes
-		 */
+		* Implementation of Oyatel API Error Codes
+		*/
 		ErrorCode: {
 			WARNING_NUMBER_FORMAT: 200,
 			ERROR_NUMBER_FORMAT: 201
 		},
 		
 		/*
-		 * Implementation of Streaming API functionality
-		 * @see http://dev.oyatel.com/documentation/streaming-api/
-		 */
+		* Implementation of Streaming API functionality
+		* @see http://dev.oyatel.com/documentation/streaming-api/
+		*/
 		Events: function() {
 			return {
 				/**
-				 * @param string channel The name/path of the event-channel to subscribe to
-				 * @param function callback(data) The function to call when events are received
-				 * @param function subscribedCallback(subscriptionObj) The function to call when the subscription is confirmed.
-				 * @return int subscriptionId
-				 */
+				* @param string channel The name/path of the event-channel to subscribe to
+				* @param function callback(data) The function to call when events are received
+				* @param function subscribedCallback(subscriptionObj) The function to call when the subscription is confirmed.
+				* @return int subscriptionId
+				*/
 				subscribe: function(channel, callback, subscribedCallback) {
 					if (_isAuthorized) {
 						// only handshake to server if we are authorized
@@ -249,24 +254,24 @@ Oyatel = function() {
 					}
 				},
 				/**
-				 * @param int subscriptionId obtained from Oyatel.Events.Call
-				 */
+				* @param int subscriptionId obtained from Oyatel.Events.Call
+				*/
 				unsubscribe: function(subscriptionObj) {
 					oyaStreamingService.removeListener(subscriptionObj);
 				}
-			}
+			};
 		}(),
 		
 		/*
-		 * Implementation of various REST API calls
-		 * @see http://dev.oyatel.com/documentation/api-oyatel-rest-api/
-		 */
+		* Implementation of various REST API calls
+		* @see http://dev.oyatel.com/documentation/api-oyatel-rest-api/
+		*/
 		User: function() {
 			return {
 				currentUser: function(cb, errorcb) {
 					_performRestRequest('https://rest.oyatel.com/account/me.json', null, cb, errorcb);
 				}
-			}
+			};
 		}(),
 		Voicemail: function() {
 			return {
@@ -283,10 +288,10 @@ Oyatel = function() {
 					_performRestRequest('https://rest.oyatel.com/voicemail/deleteMessage/' + voicemailMessageId + '.json', {}, cb, errorcb);
 				},
 				getMessageRecordingURL: function(messageId, format) {
-					var format = format || 'mp3';
+					format = format || 'mp3';
 					return _getRestRequestUri('https://rest.oyatel.com/voicemail/getMessageRecording/' + messageId + '.' + format + '/');
 				}
-			}
+			};
 		}(),
 		Queue: function() {
 			return {
@@ -299,7 +304,7 @@ Oyatel = function() {
 						queueIds: queueIds
 					}, cb, errorcb);
 				}
-			}
+			};
 		}(),
 		Did: function() {
 			return {
@@ -323,20 +328,8 @@ Oyatel = function() {
 					_performRestRequest('https://rest.oyatel.com/did/removeCallForward/' + did + '.json', null, cb, errorcb);
 				}
 				
-			}
+			};
 		}(),
-		Customer: function() {
-			return {
-				Queue: function() {
-					return {
-						getQueues: function(cb) {
-							// thought interface for customer-based operations
-							console.log('Calling customer-function');
-						}
-					}();
-				}	
-			}()
-		},
 		Sms: function() {
 			return {				
 				senderIdentities: function(cb, errorcb) {
@@ -350,7 +343,7 @@ Oyatel = function() {
 						message : message
 					}, cb, errorcb);
 				}
-			}
+			};
 		}(),
 		Call: function() {
 			return {
@@ -368,7 +361,7 @@ Oyatel = function() {
 						number: number
 					}, cb, errorcb);
 				}
-			}
+			};
 		}()
 	};
 }();
