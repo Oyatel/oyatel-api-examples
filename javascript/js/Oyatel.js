@@ -50,7 +50,7 @@ Oyatel = function() {
 	
 	var _getRestRequestUri = function(url) {
 		var assumeString = _assumedUserId ? '&assume_user_id=' + _assumedUserId : '';
-		return [url, '?oauth_token=', _getAccessToken(), assumeString].join('');
+		return [url, '?suppress_response_codes=true&oauth_token=', _getAccessToken(), assumeString].join('');
 	};
 	var _performRestRequest = function(url, data, successcb, errorcb) {	
 		$.jsonp({
