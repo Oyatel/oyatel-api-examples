@@ -273,6 +273,19 @@ Oyatel = function() {
 			return {
 				currentUser: function(cb, errorcb) {
 					_performRestRequest('https://rest.oyatel.com/account/me.json', null, cb, errorcb);
+				},
+				/**
+				 * Set's the user's availability.
+				 * 
+				 * @param {string} availability 'away', 'dnd'. null or '' for setting it to availabile
+				 * @param {Function} cb Callback to return object on success
+				 * @param {[type]} errorcb Callback to return on errornouse response
+				 */
+				setAvailability: function(availability, cb, errorcb) {
+					var params = {
+						availability: availability
+					};
+					_performRestRequest('https://rest.oyatel.com/account/setAvailability.json', params, cb, errorcb);
 				}
 			};
 		}(),
