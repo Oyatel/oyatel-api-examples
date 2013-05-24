@@ -44,7 +44,7 @@ Oyatel = function() {
 				expire = 2592000;
 			}
 			d.setTime(d.getTime() + expire * 1000);
-			$.cookie('oyatel_access', val, {expires: d});
+			$.cookie('oyatel_access', val, {expires: d, path: '/'});
 		}
 	};
 	
