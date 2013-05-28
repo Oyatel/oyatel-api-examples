@@ -22,7 +22,7 @@ Oyatel = function() {
 		_cometdServerUri = 'https://api.oyatel.com/cometd/',
 		_assumedUserId,
 		oyaStreamingService;
-	
+
 	var _getAccessToken = function() {
 		if (_cookieTokenDisabled) {
 			return _accessToken;
@@ -47,12 +47,12 @@ Oyatel = function() {
 			$.cookie('oyatel_access', val, {expires: d, path: '/'});
 		}
 	};
-	
+
 	var _getRestRequestUri = function(url) {
 		var assumeString = _assumedUserId ? '&assume_user_id=' + _assumedUserId : '';
 		return [url, '?suppress_response_codes=true&oauth_token=', _getAccessToken(), assumeString].join('');
 	};
-	var _performRestRequest = function(url, data, successcb, errorcb) {	
+	var _performRestRequest = function(url, data, successcb, errorcb) {
 		$.jsonp({
 			url: [_getRestRequestUri(url), '&callback=?'].join(''),
 			data: data,
@@ -68,11 +68,11 @@ Oyatel = function() {
 					if (typeof(errorcb) == 'function')
 						if (errorcb(data))
 							hasHandledError = true;
-					
+
 					// notify global error handlers that the issue has been handled by the callback
 					errorObj.hasBeenHandled = hasHandledError;
 					$(Oyatel).trigger('error', errorObj, data);
-					
+
 				} else if (data.errorcode && data.errorcode == "auth") {
 					// Got auth error, show login screen
 					Oyatel.deauthorize();
@@ -86,7 +86,7 @@ Oyatel = function() {
 			}
 		});
 	};
-	
+
 	var _initStreamingServer = function() {
 		if (!streaming_inited) {
 			oyaStreamingService = new com.oyatel.Service({
@@ -110,7 +110,7 @@ Oyatel = function() {
 						subscriptionSuccessCallback = scheduledSubscription[2];
 					}
 					scheduledSubscription.pop(); // pop of our own element
-					
+
 					var subscription = oyaStreamingService.addListener.apply(this, scheduledSubscription);
 					_subscriptions.push(subscription);
 					if (subscriptionSuccessCallback) {
@@ -141,7 +141,7 @@ Oyatel = function() {
 		_getStreamingServerObj: function() {
 			return oyaStreamingService;
 		},
-				
+
 		init: function(client_id, redirect_uri, cometdServerUri) {
 			oauth_client_id = client_id;
 			oauth_redirect_uri = redirect_uri;
@@ -152,7 +152,7 @@ Oyatel = function() {
 		setAssumeUserId: function(userId) {
 			_assumedUserId = userId;
 		},
-		/** 
+		/**
 		* Used to have more control over the mechanism to authorize
 		* with OAuth access token in the API.
 		*/
@@ -170,8 +170,8 @@ Oyatel = function() {
 			return $(this).bind(eventName, callback);
 		},
 		getAccessToken: _getAccessToken,
-		/** 
-		* Used to control access token only for session. 
+		/**
+		* Used to control access token only for session.
 		* Can only be used when auth cookie is disabled.
 		* @see Oyatel.disableAuthCookie()
 		*/
@@ -184,7 +184,7 @@ Oyatel = function() {
 		wasAuthorized: function(access_token, expires) {
 			_setAccessToken(access_token, expires);
 			_isAuthorized = true;
-			
+
 			$(Oyatel).trigger("authorized");
 		},
 		authorizationFailed: function(errorcode, errormsg) {
@@ -199,7 +199,7 @@ Oyatel = function() {
 			// authenticate with the Oyatel Streaming API
 
 			// check if the browser is Safari Mobile
-			
+
 			var url = 'https://oauth.oyatel.com/oauth/authorize?client_id=' + oauth_client_id + '&response_type=token&redirect_uri=' + oauth_redirect_uri;
 			var w = window.open(url,'auth_popup','width=840,height=550,scrollbars=0');
 			if (!w) { // popup-blocker or the alike
@@ -211,24 +211,26 @@ Oyatel = function() {
 
 			// log off Streaming API
 			_disconnectStreamingServer();
-			
+
 			// TODO: can/should we deauthorize OAuth access from the client-side ?
-			
+
 			// delete cookie
-			$.cookie('oyatel_access', null);
-			
+			$.cookie('oyatel_access', null, {
+        path: '/'
+      });
+
 			// notify
 			$(this).trigger("deauthorized");
 		},
-		
-		/* 
+
+		/*
 		* Implementation of Oyatel API Error Codes
 		*/
 		ErrorCode: {
 			WARNING_NUMBER_FORMAT: 200,
 			ERROR_NUMBER_FORMAT: 201
 		},
-		
+
 		/*
 		* Implementation of Streaming API functionality
 		* @see http://dev.oyatel.com/documentation/streaming-api/
@@ -264,7 +266,7 @@ Oyatel = function() {
 				}
 			};
 		}(),
-		
+
 		/*
 		* Implementation of various REST API calls
 		* @see http://dev.oyatel.com/documentation/api-oyatel-rest-api/
@@ -276,7 +278,7 @@ Oyatel = function() {
 				},
 				/**
 				 * Set's the user's availability.
-				 * 
+				 *
 				 * @param {string} availability 'away', 'dnd'. null or '' for setting it to availabile
 				 * @param {Function} cb Callback to return object on success
 				 * @param {[type]} errorcb Callback to return on errornouse response
@@ -295,7 +297,7 @@ Oyatel = function() {
 					_performRestRequest('https://rest.oyatel.com/voicemail/mailboxForUser/', null, cb, errorcb);
 				},
 				getMessages: function(vboxId, cb, errorcb) {
-					_performRestRequest('https://rest.oyatel.com/voicemail/getMessages/' + vboxId + '.json', null, cb, errorcb);	
+					_performRestRequest('https://rest.oyatel.com/voicemail/getMessages/' + vboxId + '.json', null, cb, errorcb);
 				},
 				markMessageAsRead: function(voicemailMessageId, cb, errorcb) {
 					_performRestRequest('https://rest.oyatel.com/voicemail/markMessageAsRead/' + voicemailMessageId + '.json', {}, cb, errorcb);
@@ -311,7 +313,7 @@ Oyatel = function() {
 		}(),
 		Queue: function() {
 			return {
-				
+
 				getQueues: function(cb, errorcb) {
 					_performRestRequest('https://rest.oyatel.com/queue/getQueues.json', null, cb, errorcb);
 				},
@@ -324,7 +326,7 @@ Oyatel = function() {
 		}(),
 		Did: function() {
 			return {
-				
+
 				callflows: function(did, cb, errorcb) {
 					_performRestRequest('https://rest.oyatel.com/did/callflows/' + did + '.json', null, cb, errorcb);
 				},
@@ -343,17 +345,17 @@ Oyatel = function() {
 				removeCallForward: function(did, cb, errorcb) {
 					_performRestRequest('https://rest.oyatel.com/did/removeCallForward/' + did + '.json', null, cb, errorcb);
 				}
-				
+
 			};
 		}(),
 		Sms: function() {
-			return {				
+			return {
 				senderIdentities: function(cb, errorcb) {
 					_performRestRequest('https://rest.oyatel.com/sms/senderIdentities.json', null, cb, errorcb);
 				},
 				send: function(destination_number, senderIdentity, copy_to_email, message, cb, errorcb) {
 					_performRestRequest('https://rest.oyatel.com/sms/send.json', {
-						destination_number : destination_number, 
+						destination_number : destination_number,
 						senderIdentity : senderIdentity,
 						copy_to_email : copy_to_email,
 						message : message
